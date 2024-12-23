@@ -1,29 +1,22 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Request,
-  UseGuards,
-} from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
-import { UserDto } from 'src/user/dto/user.dto';
+import { Controller, Request, Post, UseGuards, Get } from '@nestjs/common';
+import { LocalAuthGuard } from './local-auth.guard';
 import { AuthService } from './auth.service';
-import { AuthGuardJWT } from './jwt-auth.guard';
+import { JwtAuthGuard } from './jwt-auth.guard';
+import { Public } from './decorator/public';
+import { roleEnum } from './role/enum/role.enum';
+import { Roles } from './role/decorator/role.decorator';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
-  @UseGuards(AuthGuard('local'))
-  @Post('signin')
-  signIn(user: UserDto) {
-    return user;
-  }
+  @Public()
+  @UseGuards(LocalAuthGuard)
   @Post('login')
-  login(@Body() signInDto: Record<string, string>) {
-    return this.authService.signIn(signInDto.name, signInDto.password);
+  async login(@Request() req) {
+    return this.authService.login(req.user);
   }
-  @UseGuards(AuthGuardJWT)
+  @Roles(roleEnum.User)
+  @UseGuards(JwtAuthGuard)
   @Get('profile')
   getProfile(@Request() req) {
     return req.user;

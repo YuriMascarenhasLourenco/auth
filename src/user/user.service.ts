@@ -1,4 +1,10 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  LoggerService,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { plainToInstance } from 'class-transformer';
@@ -8,10 +14,15 @@ import { Repository } from 'typeorm';
 import { randomUUID } from 'crypto';
 import { UserDto } from './dto/user.dto';
 import { cryptoUtil } from 'src/common/utils/crypt.util';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectRepository(User) private repo: Repository<User>) {}
+  constructor(
+    @InjectRepository(User) private repo: Repository<User>,
+    @Inject(WINSTON_MODULE_NEST_PROVIDER)
+    private readonly logger: LoggerService,
+  ) {}
   async create(createUserDto: CreateUserDto): Promise<UserDto> {
     try {
       const user = this.repo.create(createUserDto);
@@ -29,6 +40,7 @@ export class UserService {
 
   async findAll(): Promise<UserDto[]> {
     try {
+      this.logger.log('enviando log para o servior http');
       const users = await this.repo.find({});
       return plainToInstance(UserDto, users);
     } catch (e) {
@@ -81,6 +93,7 @@ export class UserService {
     name: string,
     password: string,
   ): Promise<UserDto | null> {
+    Logger.log('');
     const user = await this.repo.findOne({
       where: {
         name: name,

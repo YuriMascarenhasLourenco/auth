@@ -1,38 +1,41 @@
-import { Module } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AuthController } from './auth.controller';
+import { AuthService } from './auth.service';
 import { UserModule } from 'src/user/user.module';
-import { localStrategy } from './auth-local.strategy';
 import { PassportModule } from '@nestjs/passport';
+import { LocalStrategy } from './local.strategy';
 import { JwtModule } from '@nestjs/jwt';
-import { JwtStrategy } from './auth-jwt.strategy';
 import { jwtConstants } from './constants';
-import { AuthGuardJWT } from './jwt-auth.guard';
+import { JwtStrategy } from './auth-jwt.strategy';
 import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from './role/roles.guard';
+import { loginMiddleware } from './middleware/api-key.middleware';
+
 @Module({
   imports: [
-    PassportModule.register({
-      defaultStrategy: 'jwt',
-      property: 'user',
-      session: false,
-    }),
-    JwtModule.register({
-      global: true,
-      secret: jwtConstants.secret,
-      signOptions: { expiresIn: '60s' },
-    }),
     UserModule,
+    PassportModule,
+    JwtModule.register({
+      secret: jwtConstants.secret,
+      signOptions: { expiresIn: '1h' },
+    }),
   ],
   controllers: [AuthController],
   providers: [
     AuthService,
-    localStrategy,
+    LocalStrategy,
     JwtStrategy,
     {
       provide: APP_GUARD,
-      useClass: AuthGuardJWT,
+      useClass: RolesGuard,
     },
   ],
   exports: [AuthService],
 })
-export class AuthModule {}
+export class AuthModule implements NestModule{
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+    .apply(loginMiddleware)
+    .forRoutes()
+  }
+}
