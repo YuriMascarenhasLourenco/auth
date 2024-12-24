@@ -1,12 +1,13 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UserModule } from './user/user.module';
+import { UserModule } from './modules/user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './user/entities/user.entity';
+import { User } from './modules/user/entities/user.entity';
 import { userSubscriber } from './common/interfaces/userSubscriber';
-import { AuthModule } from './auth/auth.module';
+import { AuthModule } from './modules/auth/auth.module';
 import { WinstonModule } from 'nest-winston';
+import { UploadModule } from './modules/upload/upload.module';
 import * as winston from 'winston';
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import * as winston from 'winston';
         }),
       ],
     }),
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [AppService],
