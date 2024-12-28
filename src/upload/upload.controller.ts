@@ -4,19 +4,15 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
+import { UploadService } from './upload.service';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { imageFileFilter } from './editFileName';
 
 @Controller('upload')
 export class UploadController {
+  constructor(private readonly uploadService: UploadService) {}
   @Post('file')
-  @UseInterceptors(
-    FileInterceptor('file', {
-      fileFilter: imageFileFilter,
-    }),
-  )
+  @UseInterceptors(FileInterceptor('file'))
   uploadFile(@UploadedFile() file: Express.Multer.File) {
-    console.log(file);
-    return { message: 'arquivo enviado!', file };
+    return this.uploadService.handleFileUpload(file);
   }
 }

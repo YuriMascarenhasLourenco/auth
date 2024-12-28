@@ -7,7 +7,8 @@ import { User } from './modules/user/entities/user.entity';
 import { userSubscriber } from './common/interfaces/userSubscriber';
 import { AuthModule } from './modules/auth/auth.module';
 import { WinstonModule } from 'nest-winston';
-import { UploadModule } from './modules/upload/upload.module';
+import { UploadModule } from './upload/upload.module';
+import { EmailModule } from './email/email.module';
 import * as winston from 'winston';
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import * as winston from 'winston';
       ],
     }),
     UploadModule,
+    EmailModule,
   ],
   controllers: [AppController],
   providers: [AppService],
