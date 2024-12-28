@@ -10,9 +10,11 @@ import { WinstonModule } from 'nest-winston';
 import { UploadModule } from './upload/upload.module';
 import { EmailModule } from './email/email.module';
 import * as winston from 'winston';
+import { ConfigModule } from '@nestjs/config';
 @Module({
   imports: [
     UserModule,
+    ConfigModule.forRoot({}),
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: 'localhost',
@@ -21,7 +23,7 @@ import * as winston from 'winston';
       password: '1234',
       database: 'nest-db',
       entities: [User],
-      synchronize: true,
+      synchronize: false,
       subscribers: [userSubscriber],
       autoLoadEntities: true,
       logging: true,

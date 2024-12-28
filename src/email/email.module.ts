@@ -11,8 +11,8 @@ import { EmailService } from './email.service';
         port: 465, // Porta SMTP
         secure: true,
         auth: {
-          user: 'postmaster@sandbox776586aee39b45e0bc366895591bb3c2.mailgun.org',
-          pass: 'ebe4a98fe5dc3934dc6772493316669c-2e68d0fb-b9e99a35',
+          user: process.env.USER,
+          pass: process.env.PASS,
         },
       },
     }),
