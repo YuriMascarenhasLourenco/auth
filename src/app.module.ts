@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { CacheModule } from '@nestjs/cache-manager';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './modules/user/user.module';
@@ -7,8 +8,8 @@ import { User } from './modules/user/entities/user.entity';
 import { userSubscriber } from './common/interfaces/userSubscriber';
 import { AuthModule } from './modules/auth/auth.module';
 import { WinstonModule } from 'nest-winston';
-import { UploadModule } from './upload/upload.module';
-import { EmailModule } from './email/email.module';
+import { UploadModule } from './modules/upload/upload.module';
+import { EmailModule } from './modules/email/email.module';
 import * as winston from 'winston';
 import { ConfigModule } from '@nestjs/config';
 @Module({
@@ -28,6 +29,13 @@ import { ConfigModule } from '@nestjs/config';
       autoLoadEntities: true,
       logging: true,
       logger: 'file',
+      migrations: [__dirname + '/migration/*{.ts,.js}'],
+      migrationsRun: true,
+    }),
+    CacheModule.register({
+      isGlobal: true,
+      ttl: 5,
+      max: 100,
     }),
     AuthModule,
     WinstonModule.forRoot({
